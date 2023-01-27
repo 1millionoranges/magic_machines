@@ -18,15 +18,41 @@ class Vector
         norm_y = @y/current_mag
         return Vector.new(norm_x, norm_y)
     end
+    def add(vector2)
+        return Vector.new(@x + vector2.x, @y + vector2.y)
+    end
+end
+class Angle
+    attr_reader :radians
+    def initialize(radians)
+        @radians = radians
+    end
+    def get_vector(magnitude=1)
+        x_norm = Math.cos(@radians)
+        y_norm = Math.sin(@radians)
+        Vector.new(x_norm * magnitude, y_norm * magnitude)
+    end
+    def rotate!(rads)
+        @radians += rads
+    end
+    def add_angle(angle)
+        return Angle.new(@radians + angle.radians)
+    end
+    def add(rads)
+        return Angle.new(@radians + rads)
+    end
+
 end
 class Force < Vector
     attr_reader :magnitude;
     attr_reader :x;
     attr_reader :y;
-    def initialize(x, y, magnitude=1)
+    def initialize(x, y, magnitude=nil)
         super(x, y)
-        @magnitude = magnitude
-        redefine_components!
+        if magnitude
+            @magnitude = magnitude
+            redefine_components!
+        end
     end
     def redefine_components!
         normalized = self.normalize

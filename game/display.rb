@@ -1,22 +1,36 @@
 require './physics.rb'
-
+require './machines.rb'
 require 'ruby2d'
+require './events.rb'
+
 set title: "Hello Triangle"
+keys_pressed = []
 t_inc = 0.1
-object = Physics.new(Vector.new(100,100), Vector.new(1,1), 1)
+
+object = RocketBooster.new(Vector.new(100,100), Vector.new(1,1), 1, Angle.new(0), 0.1, 20, 1)
+object = Machine.new(Vector.new(200,100), Vector.new(1,1), 1, Angle.new(0), 0.001, 10)
 force = Force.new( 1, -1 )
-c = Circle.new(
-        x: object.pos.x, y: object.pos.y,
-        radius: 150,
-        color: 'fuchsia',
-      )
-update do
+
+on :key_down do |event|
     
-    object.apply_force!(force, t_inc)
-    object.move!(t_inc)
-    p object.pos.x;
-    c.x = object.pos.x;
-    c.y = object.pos.y;
+    keys_pressed << event.key
+    if event.key == "escape"
+        close
+    end
+end
+on :key_up do |event|
+    keys_pressed.delete(event.key)
+end
+
+Machine.each do |machine|
+
+    
+end
+update do
+    Machine.each do |machine|
+        machine.tick!(t_inc, keys_pressed)
+    end
+    
     
  #   sleep(t_inc)
 end
