@@ -1,6 +1,6 @@
 class Vector
-    attr_reader :x;
-    attr_reader :y;
+    attr_accessor :x;
+    attr_accessor :y;
     def initialize(x , y)
         @x = x;
         @y = y;
@@ -21,12 +21,40 @@ class Vector
     def add(vector2)
         return Vector.new(@x + vector2.x, @y + vector2.y)
     end
-    def draw(pos)
+    def minus(vector2)
+        return Vector.new(@x - vector2.x, @y - vector2.y)
+    end
+    def magnitude
+        return Math.sqrt(x**2 + y**2)
+    end
+    def to_vector_2
+        angle = Angle.from_vector(self)
+        return Vector_2.new(angle, magnitude)
+    end
+    def rotate(rads)
         
+        vec2 = self.to_vector_2
+        vec2.angle.radians += rads
+   #     p "vec2"
+    #    p vec2
+    #    p "vec"
+     #   p vec2.to_vector
+        return vec2.to_vector
+    end
+end
+class Vector_2
+    attr_accessor :angle
+    attr_accessor :magnitude
+    def initialize(angle, magnitude)
+        @angle = angle
+        @magnitude = magnitude
+    end
+    def to_vector
+        Vector.new(@magnitude * Math.cos(@angle.radians), @magnitude * Math.sin(@angle.radians))
     end
 end
 class Angle
-    attr_reader :radians
+    attr_accessor :radians
     def initialize(radians)
         @radians = radians
     end
@@ -44,7 +72,28 @@ class Angle
     def add(rads)
         return Angle.new(@radians + rads)
     end
+    def minus(rads)
+        return Angle.new(@radians - rads)
+    end
+    def self.from_vector(vector)
+   #     p vector
+        if vector.x == 0
+            ang = Angle.new(Math::PI/2) 
+        else
+   #         p "vector.x, y"
+    #        p vector.x
+     #       p vector.y
 
+            ang = Angle.new(Math.atan(  (vector.y.to_f) / (vector.x)  ) )
+        end
+    #    p "ang"
+    #    p ang
+    #    if vector.y < 0
+            ang.radians += Math::PI
+     #   end
+      #  p ang
+        return ang
+    end
 end
 class Force < Vector
     attr_reader :magnitude;
@@ -63,7 +112,7 @@ class Force < Vector
         @y = normalized.y * magnitude
     end
     def redefine_magnitude!
-        @magnitude = Math.sqrt(@x**2 + @y**2)
+        @magnitude = magnitude
     end
     def add_force(force2)
         @x += force2.x

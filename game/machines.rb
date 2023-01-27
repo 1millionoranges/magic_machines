@@ -1,10 +1,15 @@
 require './physics.rb'
 
 class Machine < Physics
+
     @@machines = []
     attr_reader :size
     attr_accessor :shape
     attr_accessor :offset
+    attr_accessor :parent
+    attr_accessor :pos
+    attr_accessor :angle_offset
+    attr_accessor :angle
     def initialize(inputs)
         super(inputs)
         @angle = inputs[:angle]
@@ -25,8 +30,11 @@ class Machine < Physics
         @shape = shape
     end
     def tick!(t_inc,keys_pressed)
-        self.move!(t_inc)
-        @angle.rotate!(@angular_velocity * t_inc)
+        if !parent
+            self.move!(t_inc)
+            @angle.rotate!(@angular_velocity * t_inc)       
+        else
+        end
         draw_tick
     end
 
@@ -66,9 +74,14 @@ class RocketBooster < Machine
     end
 
     def boost!(t)
+        
         force_mag = @max_boost * @boost_mag
         force = @angle.get_vector(force_mag)
-        self.apply_force!(force, t)
+        if !parent
+            self.apply_force!(force, t)
+        else
+            parent.apply_dynamic_force!(force, @offset, t)
+        end
     end
     
     def tick!(t_inc, keys_pressed)
@@ -87,22 +100,15 @@ class PlayerRocket < RocketBooster
     def initialize(inputs)
         super(inputs)
         @velocity_line = Line.new(x1: @pos.x, y1: @pos.y, x2: @pos.x + @vel.x, y2: @pos.y + @vel.y, width: 2, color: 'red')
+        @button = inputs[:button] || 'space'
     end
     def tick!(t_inc, keys_pressed)
-        @vel.draw(@pos)
-        if keys_pressed.include?('space')
+        if keys_pressed.include?(@button)
             @shape.color = 'blue'
             @boost_mag = 1
         else
             @shape.color = 'aqua'
             @boost_mag = 0
-        end
-        if keys_pressed.include?('left')
-            @angular_velocity = -0.3
-        elsif keys_pressed.include?('right')
-            @angular_velocity = 0.3
-        else
-            @angular_velocity = 0
         end
         update_velocity_line
         super(t_inc, keys_pressed)
