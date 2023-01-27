@@ -21,6 +21,9 @@ class Vector
     def add(vector2)
         return Vector.new(@x + vector2.x, @y + vector2.y)
     end
+    def draw(pos)
+        
+    end
 end
 class Angle
     attr_reader :radians

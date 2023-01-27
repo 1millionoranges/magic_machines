@@ -2,8 +2,9 @@ require './physics.rb'
 
 class Machine < Physics
     @@machines = []
-    attr_reader :size;
-    attr_accessor :shape;
+    attr_reader :size
+    attr_accessor :shape
+    attr_accessor :offset
     def initialize(inputs)
         super(inputs)
         @angle = inputs[:angle]
@@ -56,12 +57,12 @@ class Machine < Physics
 end
 
 class RocketBooster < Machine
-
     def initialize(inputs)
         super(inputs)
         @max_boost = inputs[:max_boost]
         @max_boost = 1 if !@max_boost
-        @boost_mag = 1
+        @boost_mag = inputs[:boost_mag]
+        @boost_mag = 0 if !@boost_mag
     end
 
     def boost!(t)
@@ -72,11 +73,29 @@ class RocketBooster < Machine
     
     def tick!(t_inc, keys_pressed)
         super(t_inc, keys_pressed)
+        boost!(t_inc)
+    end
+    def draw_init
+
+        super
+        @shape.color = "red"
+
+    end
+end
+
+class PlayerRocket < RocketBooster
+    def initialize(inputs)
+        super(inputs)
+        @velocity_line = Line.new(x1: @pos.x, y1: @pos.y, x2: @pos.x + @vel.x, y2: @pos.y + @vel.y, width: 2, color: 'red')
+    end
+    def tick!(t_inc, keys_pressed)
+        @vel.draw(@pos)
         if keys_pressed.include?('space')
             @shape.color = 'blue'
-            boost!(t_inc)
+            @boost_mag = 1
         else
-            @shape.color = 'red'
+            @shape.color = 'aqua'
+            @boost_mag = 0
         end
         if keys_pressed.include?('left')
             @angular_velocity = -0.3
@@ -85,12 +104,13 @@ class RocketBooster < Machine
         else
             @angular_velocity = 0
         end
+        update_velocity_line
+        super(t_inc, keys_pressed)
     end
-    def draw_init
-
-        super
-        @shape.color = "red"
-
+    def update_velocity_line
+        @velocity_line.x1 = @pos.x
+        @velocity_line.y1 = @pos.y
+        @velocity_line.x2 = @pos.x + @vel.x * 30
+        @velocity_line.y2 = @pos.y + @vel.y * 30
     end
-
 end
