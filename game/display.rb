@@ -7,8 +7,8 @@ set title: "Hello Triangle"
 keys_pressed = []
 t_inc = 0.1
 
-object = RocketBooster.new(Vector.new(100,100), Vector.new(1,1), 1, Angle.new(0), 0.1, 20, 1)
-object = Machine.new(Vector.new(200,100), Vector.new(1,1), 1, Angle.new(0), 0.001, 10)
+RocketBooster.new(pos: Vector.new(100,100))
+RocketBooster.new(pos: Vector.new(500,100), angle: Angle.new(Math::PI))
 force = Force.new( 1, -1 )
 
 on :key_down do |event|

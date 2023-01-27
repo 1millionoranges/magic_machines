@@ -4,11 +4,14 @@ class Machine < Physics
     @@machines = []
     attr_reader :size;
     attr_accessor :shape;
-    def initialize(pos, vel, mass, angle, angular_velocity, size)
-        super(pos, vel, mass)
-        @angle = angle
-        @size = size
-        @angular_velocity = angular_velocity
+    def initialize(inputs)
+        super(inputs)
+        @angle = inputs[:angle]
+        @angle = Angle.new(0) if !@angle
+        @size = inputs[:size]
+        @size = 10 if !@size
+        @angular_velocity = inputs[:angular_velocity]
+        @angular_velocity = 0 if !@angular_velocity
         @@machines << self
         draw_init
     end
@@ -54,9 +57,10 @@ end
 
 class RocketBooster < Machine
 
-    def initialize(pos, vel, mass, angle, angular_velocity, size, max_boost)
-        super(pos, vel, mass, angle, angular_velocity, size)
-        @max_boost = max_boost
+    def initialize(inputs)
+        super(inputs)
+        @max_boost = inputs[:max_boost]
+        @max_boost = 1 if !@max_boost
         @boost_mag = 1
     end
 

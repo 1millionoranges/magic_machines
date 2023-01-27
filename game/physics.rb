@@ -70,10 +70,14 @@ class Force < Vector
 end
 class Physics
     attr_reader :pos;
-    def initialize(pos, vel, mass)
-        @pos = pos;
-        @vel = vel;
-        @mass = mass;
+    attr_reader :mass;
+    def initialize(inputs)
+        @pos = inputs[:pos];
+        @pos = Vector.new(0,0) if !@pos
+        @vel = inputs[:vel];
+        @vel = Vector.new(0,0) if !@vel
+        @mass = inputs[:mass];
+        @mass = 1 if !mass
     end
     def move!(t)
         @pos.add!(@vel.multiply(t))
